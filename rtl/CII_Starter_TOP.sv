@@ -188,4 +188,10 @@ module CII_Starter_TOP
       .m1(dmem),
       .s0(rom_if),
       .s1(sram_if));
+
+   hasti_rom rom
+     (.hclk,
+      .hresetn,
+      .bus(rom_if));
+
 endmodule
