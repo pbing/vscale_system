@@ -69,5 +69,5 @@ module hasti_bus
      if (!hresetn)
        hsel_r <= '0;
      else
-       hsel_r <= {s0.hsel, s1.hsel};
+       hsel_r <= {s1.hsel, s0.hsel};
 endmodule
