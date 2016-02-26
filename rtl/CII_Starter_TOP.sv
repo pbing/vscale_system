@@ -191,7 +191,6 @@ module CII_Starter_TOP
 
    hasti_rom rom
      (.hclk,
-      .hresetn,
       .bus(rom_if));
 
 endmodule
