@@ -152,30 +152,3 @@ interface if_htif;
       input  ipi_resp_data,
       output debug_stats_pcr);
 endinterface:if_htif
-
-interface if_sram
-  #(addr_width = 10);
-   logic                    clock;
-   logic [addr_width - 1:0] address;
-   logic [3:0]              byteena;
-   logic [31:0]             data;
-   logic                    wren;
-   logic [31:0]             q;
-
-   modport master
-     (output clock,
-      output address,
-      output byteena,
-      output data,
-      output wren,
-      input  q);
-
-   modport slave
-     (input  clock,
-      input  address,
-      input  byteena,
-      input  data,
-      input  wren,
-      output q);
-endinterface:if_sram
-
