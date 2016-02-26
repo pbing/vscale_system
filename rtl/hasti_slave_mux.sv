@@ -23,4 +23,8 @@ module hasti_slave_mux
    assign in1.hreadyout = out.hreadyout;
    assign in1.hresp	= out.hresp;
 
+   assign in2.hrdata	= '0;
+   assign in2.hreadyout = 1'b1;
+   assign in2.hresp	= OKAY;
+
 endmodule
