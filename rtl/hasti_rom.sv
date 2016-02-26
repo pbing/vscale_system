@@ -7,9 +7,9 @@ module hasti_rom
    import pk_hasti::*;
 
    rom1kx32 rom
-     (.address(bus.haddr[11:2]),
-      .clock(hclk),
-      .q(bus.hrdata));
+     (.address (bus.haddr[11:2]),
+      .clock   (hclk),
+      .q       (bus.hrdata));
 
    assign bus.hreadyout = 1'b1;
    assign bus.hresp     = OKAY;
