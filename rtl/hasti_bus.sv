@@ -41,7 +41,7 @@ module hasti_bus
 
    /* multiplexor */
    always_comb
-     case (1'b1)
+     unique case (1'b1)
        hsel_r[0]:
 	 begin
 	    m.hrdata = s0.hrdata;
