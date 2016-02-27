@@ -29,6 +29,7 @@ module hasti_bus
    assign s0.htrans	= m.htrans;
    assign s0.hmastlock	= m.hmastlock;
    assign s0.hwdata	= m.hwdata;
+
    assign s1.haddr	= m.haddr;
    assign s1.hwrite	= m.hwrite;
    assign s1.hsize	= m.hsize;
@@ -40,7 +41,7 @@ module hasti_bus
 
    /* multiplexor */
    always_comb
-     case(1'b1)
+     case (1'b1)
        hsel_r[0]:
 	 begin
 	    m.hrdata = s0.hrdata;
