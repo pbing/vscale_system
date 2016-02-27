@@ -218,11 +218,11 @@ module CII_Starter_TOP
       .out(pbus));
 
    poci_bus poci_bus
-     (.pclk,
-      .presetn,
-      .m (pbus),
-      .s0(pbus_keys),
-      .s1(pbus_led_driver));
+     (.pclk   (hclk),
+      .presetn(hresetn),
+      .m      (pbus),
+      .s0     (pbus_keys),
+      .s1     (pbus_led_driver));
 
    poci_keys poci_keys
      (.pclk   (hclk),
