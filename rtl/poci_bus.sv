@@ -9,8 +9,8 @@ module poci_bus
    import pk_poci::*;
 
    /* decoder */
-   assign s0.psel = (m.psel && m.paddr >= 32'h40000000 && m.paddr <= 32'h00000fff); // LED displays
-   assign s1.psel = (m.psel && m.paddr >= 32'h40001000 && m.paddr <= 32'h40001fff); // switches and keys
+   assign s0.psel = (m.psel && m.paddr[31:12] == base_keys[31:12]);       // switches and keys
+   assign s1.psel = (m.psel && m.paddr[31:12] == base_led_driver[31:12]); // LED displays
 
    /* bus connections */
    assign s0.paddr   = m.paddr;
