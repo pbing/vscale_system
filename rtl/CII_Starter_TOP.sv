@@ -104,15 +104,11 @@ module CII_Starter_TOP
 
    /* common signals */
    wire reset;
-   wire clk = CLOCK_50;
+   wire clk = CLOCK_24[0];
 
    /* HASTI signals */
    wire hresetn = ~reset;
    wire hclk    = clk;
-
-   /* HTIF signals */
-   wire                       htif_pcr_resp_valid;
-   wire [`HTIF_PCR_WIDTH-1:0] htif_pcr_resp_data;
 
    if_hasti_master_io imem();
    if_hasti_master_io dmem();
@@ -131,6 +127,9 @@ module CII_Starter_TOP
    assign htif.ipi_req_ready  = 1'b0;
    assign htif.ipi_resp_valid = 1'b0;
    assign htif.ipi_resp_data  = 1'b0;
+
+   /* prevent deleting vscale due to optimization */
+   assign GPIO_0 = imem.haddr;
 
    sync_reset sync_reset
      (.clk,
@@ -193,4 +192,8 @@ module CII_Starter_TOP
      (.hclk,
       .bus(rom_if));
 
+   hasti_sram sram
+     (.hclk,
+      .hresetn,
+      .bus(sram_if));
 endmodule
