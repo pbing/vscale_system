@@ -123,7 +123,7 @@ module CII_Starter_TOP
    if_hasti_master_io dmem();
    if_hasti_slave_io  hbus_rom();
    if_hasti_slave_io  hbus_sram();
-   if_hasti_slave_io  hasti_to_poci_if();
+   if_hasti_slave_io  hbus_bridge();
    if_poci            pbus();
    if_poci            pbus_keys();
    if_poci            pbus_led_driver();
