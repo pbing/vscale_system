@@ -3,5 +3,5 @@
 *.ver
 *.mif
 *.wlf
-wave.do
+wave*.do
 work/
