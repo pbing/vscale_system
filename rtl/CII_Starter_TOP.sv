@@ -2,13 +2,12 @@
  *
  * KEY[0] external reset
  * 
- * I/O port addresses:
- * HEX  0x40000010
- * LEDG 0x40000020
- * LEDR 0x40000030
- * 
- * KEY  0x40001000
- * SW   0x40001010
+ * I/O ports (see pk_vscale_system.sv for addresses):
+ * HEX
+ * LEDG
+ * LEDR
+ * KEY
+ * SW
  */
 
 `include "vscale_ctrl_constants.vh"

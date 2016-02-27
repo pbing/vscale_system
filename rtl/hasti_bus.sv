@@ -12,8 +12,8 @@ module hasti_bus
    logic [1:0] hsel_r;
 
    /* decoder */
-   assign s0.hsel = (m.haddr >= 32'h00000000 && m.haddr <= 32'h000003ff); // ROM
-   assign s1.hsel = (m.haddr >= 32'h20000000 && m.haddr <= 32'h200003ff); // SRAM
+   assign s0.hsel = (m.haddr >= addr_rom && m.haddr < (addr_rom + size_rom)); // ROM
+   assign s1.hsel = (m.haddr >= addr_ram && m.haddr < (addr_ram + size_ram)); // SRAM
 
    /* HREADY */
    assign m.hready  = hready;
