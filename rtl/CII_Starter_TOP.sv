@@ -2,7 +2,7 @@
  *
  * KEY[0] external reset
  * 
- * I/O ports (see pk_vscale_system.sv for addresses):
+ * I/O ports (see pk_poci.sv for addresses):
  * HEX
  * LEDG
  * LEDR
@@ -121,10 +121,12 @@ module CII_Starter_TOP
    /* interfaces */
    if_hasti_master_io imem();
    if_hasti_master_io dmem();
-   if_hasti_slave_io  rom_if();
-   if_hasti_slave_io  sram_if();
+   if_hasti_slave_io  hbus_rom();
+   if_hasti_slave_io  hbus_sram();
    if_hasti_slave_io  hasti_to_poci_if();
-   if_poci            poci_if();
+   if_poci            pbus();
+   if_poci            pbus_keys();
+   if_poci            pbus_led_driver();
    if_htif            htif();
 
    assign htif.reset          = reset;
@@ -196,30 +198,44 @@ module CII_Starter_TOP
       .hresetn,
       .m0(imem),
       .m1(dmem),
-      .s0(rom_if),
-      .s1(sram_if),
-      .s2(hasti_to_poci_if));
+      .s0(hbus_rom),
+      .s1(hbus_sram),
+      .s2(hbus_bridge));
 
    hasti_rom rom
      (.hclk,
-      .bus(rom_if));
+      .bus(hbus_rom));
 
    hasti_sram sram
      (.hclk,
       .hresetn,
-      .bus(sram_if));
+      .bus(hbus_sram));
 
    hasti_to_poci_bridge bridge
      (.hclk,
       .hresetn,
-      .in (hasti_to_poci_if),
-      .out(poci_if));
+      .in (hbus_bridge),
+      .out(pbus));
 
-   poci_led_driver led_driver
-       (.pclk    (hclk),
-	.presetn (hresetn),
-	.bus     (poci_if), // FIXME
-	.hex     ({HEX3, HEX2, HEX1, HEX0}),
-	.ledg    (LEDG),
-	.ledr    (LEDR));
+   poci_bus poci_bus
+     (.pclk,
+      .presetn,
+      .m (pbus),
+      .s0(pbus_keys),
+      .s1(pbus_led_driver));
+
+   poci_keys poci_keys
+     (.pclk   (hclk),
+      .presetn(hresetn),
+      .bus    (pbus_keys),
+      .key    (KEY),
+      .sw     (SW));
+
+   poci_led_driver poci_led_driver
+     (.pclk   (hclk),
+      .presetn(hresetn),
+      .bus    (pbus_led_driver),
+      .hex    ({HEX3, HEX2, HEX1, HEX0}),
+      .ledg   (LEDG),
+      .ledr   (LEDR));
 endmodule
