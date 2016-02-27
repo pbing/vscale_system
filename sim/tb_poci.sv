@@ -22,27 +22,27 @@ module tb_poci;
    logic [data_width - 1:0] pwdata;
 
    if_poci pbus();
-   if_poci pbus_s0();
-   if_poci pbus_s1();
+   if_poci pbus_keys();
+   if_poci pbus_led_driver();
 
    poci_bus poci_bus
      (.pclk,
       .presetn,
       .m(pbus),
-      .s0(pbus_s0),
-      .s1(pbus_s1));
+      .s0(pbus_keys),
+      .s1(pbus_led_driver));
 
    poci_keys poci_keys
      (.pclk    (pclk),
       .presetn (presetn),
-      .bus     (pbus_s0),
+      .bus     (pbus_keys),
       .key     (KEY),
       .sw      (SW));
 
    poci_led_driver poci_led_driver
      (.pclk    (pclk),
       .presetn (presetn),
-      .bus     (pbus_s1),
+      .bus     (pbus_led_driver),
       .hex     ({HEX3, HEX2, HEX1, HEX0}),
       .ledg    (LEDG),
       .ledr    (LEDR));
@@ -63,10 +63,10 @@ module tb_poci;
 	#100ns;
 	pwdata = $random;
 	pwrite(addr_hex, pwdata);
-	chk1a: assert (HEX0 == ~pwdata[6-:7]);
-	chk1b: assert (HEX1 == ~pwdata[14-:7]);
-	chk1c: assert (HEX2 == ~pwdata[22-:7]);
-	chk1d: assert (HEX3 == ~pwdata[30-:7]);
+	chk1a: assert (HEX0 == ~pwdata[6 -:7]) else $error("HEX0 = %h (exp. %h)", HEX0, ~pwdata[ 6:-7]);
+	chk1b: assert (HEX1 == ~pwdata[14-:7]) else $error("HEX1 = %h (exp. %h)", HEX1, ~pwdata[14:-7]);;
+	chk1c: assert (HEX2 == ~pwdata[22-:7]) else $error("HEX2 = %h (exp. %h)", HEX2, ~pwdata[22:-7]);;
+	chk1d: assert (HEX3 == ~pwdata[30-:7]) else $error("HEX3 = %h (exp. %h)", HEX3, ~pwdata[30:-7]);;
 
 	pwdata = $random;
 	pwrite(addr_ledg, pwdata);
@@ -78,10 +78,15 @@ module tb_poci;
 
 	#100ns;
 	pread(addr_hex, {1'b0, ~HEX3, 1'b0, ~HEX2, 1'b0, ~HEX1, 1'b0, ~HEX0});
-
 	pread(addr_ledg, {24'b0, LEDG});
-
 	pread(addr_ledr, {22'b0, LEDR});
+
+	#100ns;
+	KEY = $random;
+	pread(addr_key, {28'b0, KEY});
+
+	SW = $random;
+	pread(addr_sw, {22'b0, SW});
 
 	#100ns $stop;
      end:main
