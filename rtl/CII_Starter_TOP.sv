@@ -1,7 +1,16 @@
 /* FPGA top level
  *
- * KEY[0]       external reset
+ * KEY[0] external reset
+ * 
+ * I/O port addresses:
+ * HEX  0x40000010
+ * LEDG 0x40000020
+ * LEDR 0x40000030
+ * 
+ * KEY  0x40001000
+ * SW   0x40001010
  */
+
 `include "vscale_ctrl_constants.vh"
 `include "vscale_csr_addr_map.vh"
 
@@ -110,10 +119,13 @@ module CII_Starter_TOP
    wire hresetn = ~reset;
    wire hclk    = clk;
 
+   /* interfaces */
    if_hasti_master_io imem();
    if_hasti_master_io dmem();
    if_hasti_slave_io  rom_if();
    if_hasti_slave_io  sram_if();
+   if_hasti_slave_io  hasti_to_poci_if();
+   if_poci            poci_if();
    if_htif            htif();
 
    assign htif.reset          = reset;
@@ -186,7 +198,8 @@ module CII_Starter_TOP
       .m0(imem),
       .m1(dmem),
       .s0(rom_if),
-      .s1(sram_if));
+      .s1(sram_if),
+      .s2(hasti_to_poci_if));
 
    hasti_rom rom
      (.hclk,
@@ -196,4 +209,18 @@ module CII_Starter_TOP
      (.hclk,
       .hresetn,
       .bus(sram_if));
+
+   hasti_to_poci_bridge bridge
+     (.hclk,
+      .hresetn,
+      .in (hasti_to_poci_if),
+      .out(poci_if));
+
+   poci_led_driver led_driver
+       (.pclk    (hclk),
+	.presetn (hresetn),
+	.bus     (poci_if), // FIXME
+	.hex     ({HEX3, HEX2, HEX1, HEX0}),
+	.ledg    (LEDG),
+	.ledr    (LEDR));
 endmodule
