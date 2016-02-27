@@ -118,6 +118,10 @@ module CII_Starter_TOP
    wire hresetn = ~reset;
    wire hclk    = clk;
 
+   /* POCI signals */
+   wire presetn = ~reset;
+   wire pclk    = clk;
+
    /* interfaces */
    if_hasti_master_io imem();
    if_hasti_master_io dmem();
@@ -218,22 +222,22 @@ module CII_Starter_TOP
       .out(pbus));
 
    poci_bus poci_bus
-     (.pclk   (hclk),
-      .presetn(hresetn),
+     (.pclk,
+      .presetn,
       .m      (pbus),
       .s0     (pbus_keys),
       .s1     (pbus_led_driver));
 
    poci_keys poci_keys
-     (.pclk   (hclk),
-      .presetn(hresetn),
+     (.pclk,
+      .presetn,
       .bus    (pbus_keys),
       .key    (KEY),
       .sw     (SW));
 
    poci_led_driver poci_led_driver
-     (.pclk   (hclk),
-      .presetn(hresetn),
+     (.pclk,
+      .presetn,
       .bus    (pbus_led_driver),
       .hex    ({HEX3, HEX2, HEX1, HEX0}),
       .ledg   (LEDG),
