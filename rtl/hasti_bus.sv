@@ -59,7 +59,7 @@ module hasti_bus
        default
 	 begin
 	    m.hrdata = 'x;
-	    m.hresp  = (m.htrans == NONSEQ || m.htrans == SEQ) ? ERROR : OKAY;
+	    m.hresp  = (m.htrans[1]) ? ERROR : OKAY;
 	    hready   = 1'b1;
 	 end
      endcase
