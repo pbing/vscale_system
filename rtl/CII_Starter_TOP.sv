@@ -112,7 +112,7 @@ module CII_Starter_TOP
 
    /* common signals */
    wire reset;
-   wire clk = CLOCK_24[0];
+   wire clk;
 
    /* HASTI signals */
    wire hresetn = ~reset;
@@ -141,13 +141,14 @@ module CII_Starter_TOP
    assign htif.ipi_resp_valid = 1'b0;
    assign htif.ipi_resp_data  = 1'b0;
 
-   /* prevent deleting vscale due to optimization */
-   assign GPIO_0 = imem.haddr;
-
    sync_reset sync_reset
      (.clk,
       .key(KEY[0]),
       .reset);
+
+   pll_20mhz pll
+     (.inclk0 (CLOCK_50),
+      .c0     (clk));
 
    vscale_core vscale_core
      (.clk,

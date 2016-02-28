@@ -4,7 +4,7 @@ module tb_top;
    timeunit 1ns;
    timeprecision 1ps;
 
-   const realtime tclk24 = 1s / 24.0e6;
+   const realtime tclk50 = 1s / 50.0e6;
 
    bit  [1:0]  CLOCK_24;    // 24 MHz
    bit  [1:0]  CLOCK_27;    // 27 MHz
@@ -104,14 +104,16 @@ module tb_top;
 
    CII_Starter_TOP dut(.*);
 
-   always #(0.5 * tclk24) CLOCK_24 = ~CLOCK_24;
+   always #(0.5 * tclk50) CLOCK_50 = ~CLOCK_50;
 
    initial
      begin:main
-	repeat (3) @(negedge CLOCK_24[0]);
+	SW = $random;
+
+	repeat (3) @(negedge dut.clk);
 	KEY[0] = 1'b1;
 
-	repeat (50) @(negedge CLOCK_24[0]);
+	repeat (50) @(negedge dut.clk);
 	#10ns $stop;
      end:main
 endmodule
