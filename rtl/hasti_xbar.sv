@@ -9,7 +9,7 @@ module hasti_xbar
    if_hasti_slave_io m0s0(); // master0 -- slave0
    if_hasti_slave_io m0s1(); // master0 -- slave1
    if_hasti_slave_io m0s2(); // master0 -- slave2
-   
+
    if_hasti_slave_io m1s0(); // master1 -- slave0
    if_hasti_slave_io m1s1(); // master1 -- slave1
    if_hasti_slave_io m1s2(); // master1 -- slave2
@@ -19,14 +19,16 @@ module hasti_xbar
       .hresetn,
       .m(m0),
       .s0(m0s0),
-      .s1(m0s1));
+      .s1(m0s1),
+      .s2(m0s2));
 
    hasti_bus hasti_bus_1
      (.hclk,
       .hresetn,
       .m(m1),
       .s0(m1s0),
-      .s1(m1s1));
+      .s1(m1s1),
+      .s2(m1s2));
 
    hasti_slave_mux hasti_slave_mux_0
      (.hclk,
