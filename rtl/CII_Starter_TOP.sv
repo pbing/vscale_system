@@ -130,7 +130,7 @@ module CII_Starter_TOP
    if_hasti_slave_io  hbus_bridge();
    if_poci            pbus();
    if_poci            pbus_keys();
-   if_poci            pbus_led_driver();
+   if_poci            pbus_leds();
    if_htif            htif();
 
    assign htif.reset          = reset;
@@ -226,8 +226,16 @@ module CII_Starter_TOP
      (.pclk,
       .presetn,
       .m      (pbus),
-      .s0     (pbus_keys),
-      .s1     (pbus_led_driver));
+      .s0     (pbus_leds),
+      .s1     (pbus_keys));
+
+   poci_leds poci_leds
+     (.pclk,
+      .presetn,
+      .bus    (pbus_leds),
+      .hex    ({HEX3, HEX2, HEX1, HEX0}),
+      .ledg   (LEDG),
+      .ledr   (LEDR));
 
    poci_keys poci_keys
      (.pclk,
@@ -235,12 +243,4 @@ module CII_Starter_TOP
       .bus    (pbus_keys),
       .key    (KEY),
       .sw     (SW));
-
-   poci_led_driver poci_led_driver
-     (.pclk,
-      .presetn,
-      .bus    (pbus_led_driver),
-      .hex    ({HEX3, HEX2, HEX1, HEX0}),
-      .ledg   (LEDG),
-      .ledr   (LEDR));
 endmodule

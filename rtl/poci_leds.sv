@@ -1,6 +1,6 @@
 /* LED driver with POCI interface */
 
-module poci_led_driver
+module poci_leds
   (input wire              pclk,
    input wire              presetn,
    if_poci.f               bus,
@@ -13,7 +13,7 @@ module poci_led_driver
    logic read_en;
    logic write_en;
 
-   enum integer unsigned {SEL_HEX, SEL_LEDG, SEL_LEDR, NOSEL} sel;
+   enum integer unsigned {SEL_HEX, SEL_LEDG, SEL_LEDR, SEL_NONE} sel;
 
    assign bus.pready  = 1'b1;
    assign bus.pslverr = 1'b0;
@@ -23,14 +23,12 @@ module poci_led_driver
 
    /* decoder */
    always_comb
-     if (bus.paddr[11:0] == addr_hex[11:0])
-       sel = SEL_HEX;
-     else if (bus.paddr[11:0] == addr_ledg[11:0])
-       sel = SEL_LEDG;
-     else if (bus.paddr[11:0] == addr_ledr[11:0])
-       sel = SEL_LEDR;
-     else
-       sel = NOSEL;
+     case (bus.paddr[11:0])
+       addr_hex [11:0]: sel = SEL_HEX;
+       addr_ledg[11:0]: sel = SEL_LEDG;
+       addr_ledr[11:0]: sel = SEL_LEDR;
+       default          sel = SEL_NONE;
+     endcase
 
    /* multiplexor */
    always_comb
