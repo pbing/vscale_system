@@ -21,7 +21,6 @@ SECTIONS
 {
 
   /* text: test code section */
-  . = 0x100;
   .text : 
   {
     *(.text)
