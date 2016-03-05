@@ -11,7 +11,7 @@ module poci_keys
 
    logic read_en;
    
-   enum integer unsigned {SEL_KEY, SEL_SW, NOSEL} sel;
+   enum integer unsigned {SEL_KEY, SEL_SW, SEL_NONE} sel;
 
    assign bus.pready  = 1'b1;
    assign bus.pslverr = 1'b0;
@@ -25,7 +25,7 @@ module poci_keys
      else if (bus.paddr[11:0] == addr_sw[11:0])
        sel = SEL_SW;
      else
-       sel = NOSEL;
+       sel = SEL_NONE;
 
    /* multiplexor */
    always_comb
