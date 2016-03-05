@@ -5,9 +5,6 @@ package pk_hasti;
      data_width = 32,
      addr_width = 32;
 
-   parameter bit [addr_width - 1:0] addr_rom = 32'h00000000, size_rom = 32'd1024,
-				    addr_ram = 32'h20000000, size_ram = 32'd1024;
-
    typedef enum logic [1:0] {IDLE,
 			     BUSY,
 			     NONSEQ,

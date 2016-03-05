@@ -8,13 +8,29 @@ module hasti_bus
 
    import pk_hasti::*;
 
-   logic       hready;
-   logic [2:0] hsel_r;
+   enum integer unsigned {SEL_ROM, SEL_RAM, SEL_IO, SEL_NONE} sel, sel_r;
 
-   /* decoder */
-   assign s0.hsel = (m.haddr >= addr_rom && m.haddr < (addr_rom + size_rom)); // ROM
-   assign s1.hsel = (m.haddr >= addr_ram && m.haddr < (addr_ram + size_ram)); // SRAM
-   assign s2.hsel = (m.haddr[31:30] != 2'b00);                                // I/O
+   logic hready;
+
+   /*
+    * decoder
+    *
+    * ROM   0x00000000...0x00000fff
+    * SRAM  0x20000000...0x20000fff
+    * I/O   0x80000000...0xffffffff
+    */
+   always_comb
+     casez (m.haddr)
+       32'h00000???                        : sel = SEL_ROM;
+       32'h20000???                        : sel = SEL_RAM;
+       32'b1???????????????????????????????: sel = SEL_IO;
+       default                               sel = SEL_NONE;
+     endcase
+
+   /* HSEL */
+   assign s0.hsel = (sel == SEL_ROM);
+   assign s1.hsel = (sel == SEL_RAM);
+   assign s2.hsel = (sel == SEL_IO);
 
    /* HREADY */
    assign m.hready  = hready;
@@ -22,7 +38,7 @@ module hasti_bus
    assign s1.hready = hready;
    assign s2.hready = hready;
 
-   /* bus connections */
+   /* remaining bus connections */
    assign s0.haddr	= m.haddr;
    assign s0.hwrite	= m.hwrite;
    assign s0.hsize	= m.hsize;
@@ -52,22 +68,22 @@ module hasti_bus
 
    /* multiplexor */
    always_comb
-     unique case (1'b1)
-       hsel_r[0]:
+     case (sel_r)
+       SEL_ROM:
 	 begin
 	    m.hrdata = s0.hrdata;
 	    m.hresp  = s0.hresp;
 	    hready   = s0.hreadyout;
 	 end
 
-       hsel_r[1]:
+       SEL_RAM:
 	 begin
 	    m.hrdata = s1.hrdata;
 	    m.hresp  = s1.hresp;
 	    hready   = s1.hreadyout;
 	 end
 
-       hsel_r[2]:
+       SEL_IO:
 	 begin
 	    m.hrdata = s2.hrdata;
 	    m.hresp  = s2.hresp;
@@ -78,7 +94,8 @@ module hasti_bus
        default
 	 begin
 	    m.hrdata = 'x;
-	    m.hresp  = (m.htrans[1]) ? ERROR : OKAY;
+	    //m.hresp  = (m.htrans == NONSEQ || m.htrans == SEQ) ? ERROR : OKAY; // FIXME: vscale_core oscillates!
+	    m.hresp  = OKAY;
 	    hready   = 1'b1;
 	 end
      endcase
@@ -86,9 +103,9 @@ module hasti_bus
    /* registered mux control */
    always_ff @(posedge hclk)
      if (!hresetn)
-       hsel_r <= '0;
+       sel_r <= SEL_NONE;
      else
        /* advance pipeline */
        if (hready)
-         hsel_r <= {s2.hsel, s1.hsel, s0.hsel};
+         sel_r <= sel;
 endmodule

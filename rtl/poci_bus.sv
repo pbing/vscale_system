@@ -8,16 +8,27 @@ module poci_bus
 
    import pk_poci::*;
 
+   enum integer unsigned {SEL_LEDS, SEL_KEYS, SEL_NONE} sel;
+
    /* decoder */
-   assign s0.psel = (m.psel && m.paddr[31:12] == base_keys[31:12]);       // switches and keys
-   assign s1.psel = (m.psel && m.paddr[31:12] == base_led_driver[31:12]); // LED displays
+   always_comb
+     if (m.psel)
+       case (m.paddr[31:12])
+         base_leds[31:12]: sel = SEL_LEDS;
+         base_keys[31:12]: sel = SEL_KEYS;
+         default           sel = SEL_NONE;
+       endcase
+     else
+       sel = SEL_NONE;
 
    /* bus connections */
+   assign s0.psel    = (sel == SEL_LEDS);
    assign s0.paddr   = m.paddr;
    assign s0.penable = m.penable;
    assign s0.pwrite  = m.pwrite;
    assign s0.pwdata  = m.pwdata;
 
+   assign s1.psel    = (sel == SEL_KEYS);
    assign s1.paddr   = m.paddr;
    assign s1.penable = m.penable;
    assign s1.pwrite  = m.pwrite;
@@ -25,15 +36,15 @@ module poci_bus
 
    /* multiplexor */
    always_comb
-     case (1'b1)
-       s0.psel:
+     case (sel)
+       SEL_LEDS:
 	 begin
 	    m.prdata  = s0.prdata;
 	    m.pready  = s0.pready;
 	    m.pslverr = s0.pslverr;
 	 end
 
-       s1.psel:
+       SEL_KEYS:
 	 begin
 	    m.prdata  = s1.prdata;
 	    m.pready  = s1.pready;
