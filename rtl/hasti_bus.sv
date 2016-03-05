@@ -88,5 +88,7 @@ module hasti_bus
      if (!hresetn)
        hsel_r <= '0;
      else
-       hsel_r <= {s2.hsel, s1.hsel, s0.hsel};
+       /* advance pipeline */
+       if (hready)
+         hsel_r <= {s2.hsel, s1.hsel, s0.hsel};
 endmodule
