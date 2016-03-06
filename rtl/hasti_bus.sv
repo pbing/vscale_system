@@ -8,9 +8,13 @@ module hasti_bus
 
    import pk_hasti::*;
 
-   enum integer unsigned {SEL_ROM, SEL_RAM, SEL_IO, SEL_NONE} sel, sel_r;
+   enum int unsigned {SEL_ROM, SEL_RAM, SEL_IO, SEL_NONE} sel, sel_r;
 
    logic hready;
+
+   /* default slave */
+   logic   ds_hready;
+   hresp_t ds_hresp;
 
    /*
     * decoder
@@ -94,9 +98,8 @@ module hasti_bus
        default
 	 begin
 	    m.hrdata = 'x;
-	    //m.hresp  = (m.htrans == NONSEQ || m.htrans == SEQ) ? ERROR : OKAY; // FIXME: vscale_core oscillates!
-	    m.hresp  = OKAY;
-	    hready   = 1'b1;
+            m.hresp  = ds_hresp;
+	    hready   = ds_hready;
 	 end
      endcase
 
@@ -108,4 +111,52 @@ module hasti_bus
        /* advance pipeline */
        if (hready)
          sel_r <= sel;
+
+
+
+   /* default slave */
+
+   enum int unsigned {DS_IDLE, DS_RESP[2]} ds_state, ds_next;
+
+   wire trans_req = (sel == SEL_NONE) && (m.htrans == NONSEQ || m.htrans == SEQ) && m.hready;
+
+   always_ff @(posedge hclk)
+     if (!hresetn)
+       ds_state <= DS_IDLE;
+     else
+       ds_state <= ds_next;
+
+   always_comb
+     begin
+        ds_next = ds_state;
+
+        case (ds_state)
+          DS_IDLE:
+            begin
+               ds_hresp  = OKAY;
+               ds_hready = 1'b1;
+
+               if (trans_req)
+                 ds_next = DS_RESP0;
+            end
+
+          DS_RESP0:
+            begin
+               ds_hresp  = ERROR;
+               ds_hready = 1'b0;
+
+               if (!trans_req)
+                 ds_next = DS_RESP1;
+            end
+
+          DS_RESP1:
+            begin
+               ds_hresp  = ERROR;
+               ds_hready = 1'b1;
+
+               if (!trans_req)
+                 ds_next = DS_IDLE;
+            end
+        endcase
+     end
 endmodule
