@@ -114,7 +114,19 @@ module hasti_bus
 
 
 
-   /* default slave */
+   /*
+    * Default Slave
+    *
+    * If a NONSEQUENTIAL or SEQUENTIAL transfer is attempted to a
+    * nonexistent address location then the default slave provides an
+    * ERROR response. IDLE or BUSY transfers to nonexistent locations
+    * result in a zero wait state OKAY response.
+    *
+    * To start the ERROR response, the slave drives HRESP HIGH to
+    * indicate ERROR while driving HREADY LOW to extend the transfer
+    * for one extra cycle. In the next cycle HREADY is driven HIGH to
+    * end the transfer and HRESP remains driven HIGH to indicate ERROR.
+    */
 
    enum int unsigned {DS_IDLE, DS_RESP[2]} ds_state, ds_next;
 
