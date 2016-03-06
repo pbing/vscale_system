@@ -11,7 +11,7 @@ module poci_keys
 
    logic read_en;
    
-   enum integer unsigned {SEL_KEY, SEL_SW, SEL_NONE} sel;
+   enum int unsigned {SEL_KEY, SEL_SW, SEL_NONE} sel;
 
    assign bus.pready  = 1'b1;
    assign bus.pslverr = 1'b0;

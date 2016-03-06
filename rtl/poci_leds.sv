@@ -13,7 +13,7 @@ module poci_leds
    logic read_en;
    logic write_en;
 
-   enum integer unsigned {SEL_HEX, SEL_LEDG, SEL_LEDR, SEL_NONE} sel;
+   enum int unsigned {SEL_HEX, SEL_LEDG, SEL_LEDR, SEL_NONE} sel;
 
    assign bus.pready  = 1'b1;
    assign bus.pslverr = 1'b0;

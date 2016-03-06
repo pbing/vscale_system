@@ -8,7 +8,7 @@ module poci_bus
 
    import pk_poci::*;
 
-   enum integer unsigned {SEL_LEDS, SEL_KEYS, SEL_NONE} sel;
+   enum int unsigned {SEL_LEDS, SEL_KEYS, SEL_NONE} sel;
 
    /* decoder */
    always_comb
