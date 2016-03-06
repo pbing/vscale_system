@@ -127,36 +127,38 @@ module hasti_bus
        ds_state <= ds_next;
 
    always_comb
-     begin
-        ds_next = ds_state;
+     case (ds_state)
+       DS_IDLE:
+         begin
+            ds_hresp  = OKAY;
+            ds_hready = 1'b1;
 
-        case (ds_state)
-          DS_IDLE:
-            begin
-               ds_hresp  = OKAY;
-               ds_hready = 1'b1;
+            if (trans_req)
+              ds_next = DS_RESP0;
+            else
+              ds_next = DS_IDLE;
+         end
 
-               if (trans_req)
-                 ds_next = DS_RESP0;
-            end
+       DS_RESP0:
+         begin
+            ds_hresp  = ERROR;
+            ds_hready = 1'b0;
 
-          DS_RESP0:
-            begin
-               ds_hresp  = ERROR;
-               ds_hready = 1'b0;
+            if (trans_req)
+              ds_next = DS_RESP0;
+            else
+              ds_next = DS_RESP1;
+         end
 
-               if (!trans_req)
-                 ds_next = DS_RESP1;
-            end
+       DS_RESP1:
+         begin
+            ds_hresp  = ERROR;
+            ds_hready = 1'b1;
 
-          DS_RESP1:
-            begin
-               ds_hresp  = ERROR;
-               ds_hready = 1'b1;
-
-               if (!trans_req)
-                 ds_next = DS_IDLE;
-            end
-        endcase
-     end
+            if (trans_req)
+              ds_next = DS_RESP0;
+            else
+              ds_next = DS_IDLE;
+         end
+     endcase
 endmodule
