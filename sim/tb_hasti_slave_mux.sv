@@ -74,7 +74,7 @@ module tb_master
    always @(posedge hclk)
      if (!hresetn)
        begin
-          s.haddr     <= 32'h12345678;
+          s.haddr     <= '0;
           s.hwrite    <= 1'b0;
           s.hsize     <= WORD;
           s.hburst    <= SINGLE;
@@ -87,11 +87,13 @@ module tb_master
      else
        begin
           repeat ({$random} % 5) @(posedge hclk);
+          s.haddr  <= {$random} & -4;
           s.hwrite <= $random;
           s.htrans <= NONSEQ;
           s.hsel   <= 1'b1;
 
           @(posedge hclk);
+          s.haddr  <= '0;
           s.hwrite <= 1'b0;
           s.htrans <= IDLE;
           s.hsel   <= 1'b0;
