@@ -28,17 +28,6 @@ module hasti_slave_mux
     * PORT 0
     ****************************************************************/
 
-   assign valid[0] = in0.hsel && in0.hready && (in0.htrans == NONSEQ || in0.htrans == SEQ);
-
-   always_ff @(posedge hclk)
-     if (!hresetn)
-       skb_valid[0] <= 1'b0;
-     else
-       if (gnt_addr_phase == GNT0)
-         skb_valid[0] <= 1'b0;
-       else if (!skb_valid[0])
-         skb_valid[0] <= valid[0];
-
    /* skid buffers */
    always_ff @(posedge hclk)
      if (!hresetn)
@@ -63,7 +52,6 @@ module hasti_slave_mux
             skb_hmastlock[0] <= in0.hmastlock;
          end
 
-
    assign in0.hrdata = out.hrdata;
 
    always_comb
@@ -76,21 +64,9 @@ module hasti_slave_mux
 
    assign in0.hresp = (gnt_data_phase == GNT0) ? out.hresp : OKAY;
 
-
    /****************************************************************
     * PORT 1
     ****************************************************************/
-
-   assign valid[1] = in1.hsel && in1.hready && (in1.htrans == NONSEQ || in1.htrans == SEQ);
-
-   always_ff @(posedge hclk)
-     if (!hresetn)
-       skb_valid[1] <= 1'b0;
-     else
-       if (gnt_addr_phase == GNT1)
-         skb_valid[1] <= 1'b0;
-       else if (!skb_valid[1])
-         skb_valid[1] <= valid[1];
 
    /* skid buffers */
    always_ff @(posedge hclk)
@@ -115,7 +91,6 @@ module hasti_slave_mux
             skb_htrans[1]    <= in1.htrans;
             skb_hmastlock[1] <= in1.hmastlock;
          end
-
 
    assign in1.hrdata = out.hrdata;
 
@@ -184,6 +159,27 @@ module hasti_slave_mux
    /****************************************************************
     * Control
     ****************************************************************/
+
+   assign valid[0] = in0.hsel && in0.hready && (in0.htrans == NONSEQ || in0.htrans == SEQ);
+   assign valid[1] = in1.hsel && in1.hready && (in1.htrans == NONSEQ || in1.htrans == SEQ);
+
+   always_ff @(posedge hclk)
+     if (!hresetn)
+       skb_valid[0] <= 1'b0;
+     else
+       if (gnt_addr_phase == GNT0)
+         skb_valid[0] <= 1'b0;
+       else if (!skb_valid[0])
+         skb_valid[0] <= valid[0];
+
+   always_ff @(posedge hclk)
+     if (!hresetn)
+       skb_valid[1] <= 1'b0;
+     else
+       if (gnt_addr_phase == GNT1)
+         skb_valid[1] <= 1'b0;
+       else if (!skb_valid[1])
+         skb_valid[1] <= valid[1];
 
    assign request[0] = valid[0] | skb_valid[0];
    assign request[1] = valid[1] | skb_valid[1];
